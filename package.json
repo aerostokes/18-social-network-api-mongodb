@@ -1,0 +1,23 @@
+{
+  "name": "18-social-network-api-mongodb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aerostokes/18-social-network-api-mongodb.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aerostokes/18-social-network-api-mongodb/issues"
+  },
+  "homepage": "https://github.com/aerostokes/18-social-network-api-mongodb#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^6.9.2"
+  }
+}
