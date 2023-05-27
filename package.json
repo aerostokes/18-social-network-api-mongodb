@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/aerostokes/18-social-network-api-mongodb#readme",
   "dependencies": {
+    "dayjs": "^1.11.7",
     "express": "^4.18.2",
     "mongoose": "^6.9.2"
   }
