@@ -37,7 +37,7 @@ router.get("/", (req, res) => {
 
 // Get User by id
 router.get("/:id", (req, res) => {
-    User.findOne({ _id: req.params.id})
+    User.findOne({ _id: req.params.id })
     .select("-__v")
     .populate({path: "thoughts", select: "-__v" })
     .populate({path: "friends", select: "-__v" })
