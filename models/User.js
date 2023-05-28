@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
+const { Schema, model } = require('mongoose');
+// const { Thought } = require("./Thought");
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
     name: {
         type: String, 
         unique: true, 
@@ -18,8 +19,40 @@ const userSchema = new mongoose.Schema({
             message: `Not a valid email type`
           },
     },
+    thoughts: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Thought",
+        },
+    ],
+    friends: [ 
+        {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+        },
+    ],
+},
+{
+  toJSON: {
+    virtuals: true,
+  },
+  toObject: {
+    virtuals: true,
+  },
+  id: false,
 });
 
-const User = mongoose.model("User", userSchema);
+userSchema.virtual("friendCount").get(function() {
+    return this.friends.length;
+});
+
+// userSchema.virtual("friends", {
+//     ref: "Friend",
+//     localField: "_id",
+//     foreignField: ""
+
+// })
+
+const User = model("User", userSchema);
 
 module.exports = User;

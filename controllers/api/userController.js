@@ -10,6 +10,7 @@ router.post("/", (req, res) => {
     User.create({
         name: req.body.name,
         email: req.body.email,
+
     }).then(userObj => {
         res.json({ msg: "Successfully created", userObj })
     }).catch(err => {
@@ -20,9 +21,9 @@ router.post("/", (req, res) => {
 
 // Get all Users
 router.get("/", (req, res) => {
-    User.find({}).then(usersArr => {
-        console.log(usersArr)
-        console.log(usersArr.length)
+    User.find({})
+    .select('-__v')
+    .then(usersArr => {
         if (usersArr.length === 0) {
             return res.status(404).json({ msg: "No Users found" });
         } else {
@@ -34,10 +35,12 @@ router.get("/", (req, res) => {
     });
 });
 
-/*
 // Get User by id
 router.get("/:id", (req, res) => {
-    User.findByPk(req.params.id)
+    User.findOne({ _id: req.params.id})
+    .select("-__v")
+    .populate({path: "thoughts", select: "-__v" })
+    .populate({path: "friends", select: "-__v" })
     .then(userObj => {
         if (!userObj) {
             return res.status(404).json({ msg: "UserId not found" });
@@ -51,63 +54,31 @@ router.get("/:id", (req, res) => {
 });
 
 
-
-// Login
-router.post("/login", (req, res) => {
-    User.findOne({
-        where: { username: req.body.username },
-    }).then(userObj => {
-        if (!userObj) {
-            return res.status(401).json({ msg: "Invalid username/password" });
-        } else if (bcrypt.compareSync(req.body.password, userObj.password)) {
-            req.session.UserId = userObj.id;
-            req.session.loggedIn = true;
-            return res.json([
-                { msg: "Login successful" },
-                req.session,
-            ]);
-        } else {
-            return res.status(401).json({ msg: "Invalid username/password" });
-        };
+// Update User by id
+router.put("/:id", (req, res) => {
+    User.findOneAndUpdate(
+        { _id: req.params.id }, 
+        req.body, 
+        { new: true }
+    ).then(userObj => {
+        return res.json({ msg: "Successfully updated", user: userObj });
     }).catch(err => {
         console.log(err);
-        res.status(500).json({ msg: "Error occurred", err });
+        res.status(500).json({ msg: "Error Occurred", err });
     });
 });
 
-// Logout
-router.post("/logout", (req, res) => {
-    req.session.destroy();
-    res.json({ msg: "Logout successful"});
-});
 
-// Put update User by id
-router.put("/:id", (req, res) => {
-    if (!req.session.loggedIn) {
-        return res.status(403).json({ msg: "Login required" })
-    } else if (req.session.UserId !== parseInt(req.params.id)) {
-        return res.status(403).json({ msg: "Not authorized for this UserId" })
-    } else {
-        User.update({
-            username: req.body.username,
-        },{
-            where: { id: req.params.id },
-        }).then(userArr => {
-            return res.json({ msg: "Successfully updated" });
-        }).catch(err => {
-            console.log(err);
-            res.status(500).json({ msg: "Error Occurred", err });
-        });
-    };
-});
-*/
-
-// Delete User by id and logout
+// Delete User by id 
 router.delete("/:id", (req, res) => {
     User.findOneAndDelete({
         _id: req.params.id,
     }).then(userObj => {
-        return res.json({ msg: `Successfully deleted ${userObj}` });
+        if (!userObj) {
+            return res.status(404).json({ msg: "UserId not found" });
+        } else {
+            return res.json({ msg: `Successfully deleted ${userObj}` });
+        }
     }).catch(err => {
         console.log(err);
         res.status(500).json({ msg: "Error Occurred", err });
@@ -116,6 +87,47 @@ router.delete("/:id", (req, res) => {
 
 
 
+// Add a "friendship"
+router.post("/:userId/friends/:friendId", async (req, res) => {
+    try {
+        const userObj = await User.findOneAndUpdate(
+            { _id: req.params.userId },
+            { $addToSet: { friends: req.params.friendId } },
+            { new: true },
+        )
+        await User.findOneAndUpdate(
+            { _id: req.params.friendId },
+            { $addToSet: { friends: req.params.userId } },
+            { new: true },
+        )
+        return res.json({ msg: "Successfully added new friendship: ", User: userObj})
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ msg: "Error Occurred", err });
+    }
+});
+
+
+
+// Delete a "friendship"
+router.delete("/:userId/friends/:friendId", async (req, res) => {
+    try {
+        const userObj = await User.findOneAndUpdate(
+            { _id: req.params.userId },
+            { $pull: { friends: req.params.friendId } },
+            { new: true },
+        )
+        await User.findOneAndUpdate(
+            { _id: req.params.friendId },
+            { $pull: { friends: req.params.userId } },
+            { new: true },
+        )
+        return res.json({ msg: "Successfully removed friendship: ", User: userObj})
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ msg: "Error Occurred", err });
+    }
+});
+
+
 module.exports = router;
-
-

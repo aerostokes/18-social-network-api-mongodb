@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
+const { Schema, model } = require('mongoose');
 const dayjs = require("dayjs")
 
-const thoughtSchema = new mongoose.Schema({
+const thoughtSchema = new Schema({
     thoughtText: {
         type: String, 
         required: true, 
@@ -13,6 +13,11 @@ const thoughtSchema = new mongoose.Schema({
         required: true, 
         get: formatDate
     },
+},{
+    toJSON: { 
+        getters: true,
+        virtuals: true,
+    },
 });
 
 //
@@ -20,6 +25,6 @@ function formatDate(createdAt) {
     return dayjs(createdAt).format("MM/DD/YY HH:mm")
 }
 
-const User = mongoose.model("User", thoughtSchema);
+const Thought = model("Thought", thoughtSchema);
 
-module.exports = User;
+module.exports = Thought;
