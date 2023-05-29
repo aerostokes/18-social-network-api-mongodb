@@ -64,7 +64,7 @@ Create, read, update, and delete database entries using the following endpoints/
 - POST     /api/thoughts/`thoughtId`/reactions     --create a new reaction to a Thought
 - DELETE     /api/thoughts/`thoughtId`/reactions/`reactionId`     --delete the Reaction from the Thought
 
-See [Walk-Thru Video]() for a detailed walk-thru of installing and using the API with sample data using VS Code's Integrated Terminal and Insomnia REST API Client.
+See [Walk-Thru Video](https://drive.google.com/file/d/1AQjGrYMaG1o_rCZn9aZ3wP499ZfMYPkW/view) for a detailed walk-thru of installing and using the API with sample data using VS Code's Integrated Terminal and Insomnia REST API Client.
 
 ## License
 
